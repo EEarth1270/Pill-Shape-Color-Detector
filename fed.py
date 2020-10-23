@@ -34,14 +34,14 @@ def largest_contour(mask):
     # sorts contours according to their area from largest to smallest.
     largestCont = contours[2]  # store the largest contour
     area = cv2.contourArea(largestCont)
-    print('area = ', area)
+    # print('area = ', area)
     return largestCont
 
 
 def drawing_cont(img, contour):
     epsilon = 0.037 * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
-    print(len(approx))
+    # print(len(approx))
     cv2.drawContours(img, approx, -1, (255, 0, 255), 5)
     return approx
 
@@ -54,14 +54,29 @@ def shapeDetector(path_img):
     cont = largest_contour(mask)
     # we use the second largest because normally largest are box of the picture
     approx = drawing_cont(img, cont)
-    show_image(img)
-    shapePred(approx)
-    pass
+    # show_image(img)
+    pred = shapePred(approx)
+    # cv2.imwrite(save_path,img)
+    return len(approx), pred
 
 
 def shapePred(approx):
-    if len(approx) == 2:
-        print('Shape is capsule or Oval')
-    if len(approx) == 4:
-        print('shape is Circle or square')
-    pass
+    a = 'FREEFORM'
+    if len(approx) == 6:
+        a = 'OVAL'
+        # print(a)
+    elif len(approx) == 4:
+        a = 'QUADRANGLE'
+        # print(a)
+    elif len(approx) == 7:
+        a = 'CAPSULE'
+        # print('Capsule')
+    elif len(approx) == 5 or len(approx) == 3:
+        a = 'TRIANGLE'
+        # print(a)
+    elif len(approx) == 8:
+        a = 'ROUND'
+        # print(a)
+    return a
+
+
