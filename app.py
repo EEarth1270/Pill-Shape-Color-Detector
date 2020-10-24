@@ -1,8 +1,3 @@
-import imutils
-import cv2
-import matplotlib.pyplot as plt
-import fed
-
 #import picture
 
 # Round mostly 8

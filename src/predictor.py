@@ -1,8 +1,8 @@
 import pandas as pd
 import os
-import fed
+from func import fed
 from tqdm import tqdm
-dataset = pd.read_csv('../Pillbox.csv')
+dataset = pd.read_csv('../../Pillbox.csv')
 
 # we only consider dataset that only have images.
 dataset = dataset[dataset.has_image == True]
@@ -47,6 +47,9 @@ cond4 = dataset.splshape_text == 'SEMI-CIRCLE'
 dataset.loc[cond4, 'splshape_text'] = 'FREEFORM'
 # print(dataset[dataset.splshape_text == 'TEAR'])
 
+block_size= [3,5,7]
+contant= [1,2,3]
+coef  = [0.01,0.015,0.02,0.025,0.03]
 
 print(dataset.splshape_text.value_counts())
 # dataset.splimage.unique().tofile('../file_image_count.csv', ',')
@@ -54,10 +57,10 @@ print(dataset.splshape_text.value_counts())
 for index,row in tqdm(dataset.iterrows()):
     condition = dataset['splimage'] == row.splimage
     img = row.splimage + '.jpg'
-    path = os.path.join('..', 'pillbox_production_images_full_201812', img)
+    path = os.path.join('../..', 'pillbox_production_images_full_201812', img)
     number_polygon, shape = fed.shapeDetector(path)
     # print(path, number_polygon, shape)
     dataset.loc[condition, 'number_polygon'] = number_polygon
     dataset.loc[condition, 'predict_shape'] = shape
 
-dataset.to_csv('../dataset_afterpred.csv')
+dataset.to_csv('../../dataset_afterpred.csv')

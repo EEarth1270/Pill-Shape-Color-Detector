@@ -20,9 +20,9 @@ def cvt2gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-def create_mask(img, number):
+def create_mask(img, number=25,cont=3.5):
     # return cv2.threshold(img,number,255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 3.5)
+    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,  number,cont)
 
 
 def largest_contour(mask):
@@ -38,12 +38,14 @@ def largest_contour(mask):
     return largestCont
 
 
-def drawing_cont(img, contour):
-    epsilon = 0.037 * cv2.arcLength(contour, True)
+def drawing_cont(img, contour,coefficient=0.037):
+    epsilon = coefficient * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     # print(len(approx))
     cv2.drawContours(img, approx, -1, (255, 0, 255), 5)
     return approx
+
+
 
 
 def shapeDetector(path_img):
@@ -73,5 +75,18 @@ def shapePred(approx):
     elif len(approx) == 4:
         a = 'QUADRANGLE'
     return a
+
+
+def Grid_shape_pred(path_img,block_size,constant,coefficient):
+    img = load_image(path_img)
+    gray = cvt2gray(img)
+    mask = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, constant)
+    cont = largest_contour(mask)
+    approx = drawing_cont(img, cont,coefficient)
+    # show_image(img)
+    pred = shapePred(approx)
+    # cv2.imwrite(save_path,img)
+    return len(approx), pred
+
 
 
