@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import fed
-
+from tqdm import tqdm
 dataset = pd.read_csv('../Pillbox.csv')
 
 # we only consider dataset that only have images.
@@ -51,12 +51,12 @@ dataset.loc[cond4, 'splshape_text'] = 'FREEFORM'
 print(dataset.splshape_text.value_counts())
 # dataset.splimage.unique().tofile('../file_image_count.csv', ',')
 
-for img in dataset['splimage']:
-    condition = dataset['splimage'] == img
-    img = img + '.jpg'
+for index,row in tqdm(dataset.iterrows()):
+    condition = dataset['splimage'] == row.splimage
+    img = row.splimage + '.jpg'
     path = os.path.join('..', 'pillbox_production_images_full_201812', img)
     number_polygon, shape = fed.shapeDetector(path)
-    print(path, number_polygon, shape)
+    # print(path, number_polygon, shape)
     dataset.loc[condition, 'number_polygon'] = number_polygon
     dataset.loc[condition, 'predict_shape'] = shape
 

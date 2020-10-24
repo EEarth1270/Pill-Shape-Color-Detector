@@ -22,7 +22,7 @@ def cvt2gray(img):
 
 def create_mask(img, number):
     # return cv2.threshold(img,number,255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 2.5)
+    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 3.5)
 
 
 def largest_contour(mask):
@@ -32,7 +32,7 @@ def largest_contour(mask):
     # where cnts is the variable in which contours are stored, replace it with your variable name
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
     # sorts contours according to their area from largest to smallest.
-    largestCont = contours[2]  # store the largest contour
+    largestCont = contours[1]  # store the largest contour
     area = cv2.contourArea(largestCont)
     # print('area = ', area)
     return largestCont
@@ -62,21 +62,16 @@ def shapeDetector(path_img):
 
 def shapePred(approx):
     a = 'FREEFORM'
-    if len(approx) == 6:
+    if len(approx) == 8:
+        a = 'ROUND'
+    elif len(approx) == 7:
         a = 'OVAL'
-        # print(a)
+    elif len(approx) == 6:
+        a = 'CAPSULE'
+    elif len(approx) == 5:
+        a = 'TRIANGLE'
     elif len(approx) == 4:
         a = 'QUADRANGLE'
-        # print(a)
-    elif len(approx) == 7:
-        a = 'CAPSULE'
-        # print('Capsule')
-    elif len(approx) == 5 or len(approx) == 3:
-        a = 'TRIANGLE'
-        # print(a)
-    elif len(approx) == 8:
-        a = 'ROUND'
-        # print(a)
     return a
 
 

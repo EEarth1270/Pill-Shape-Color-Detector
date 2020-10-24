@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 
 
 def generate_confusion_matrix(dataframe, class_labels):
@@ -16,8 +17,10 @@ def generate_confusion_matrix(dataframe, class_labels):
     return result
 
 
-def print_confusion_matrix(result, class_labels):
-    for i in range(len(class_labels)):
-        for j in range(len(class_labels)):
-            if result[i][j] == 0: continue
-            print('Actual [{}], Predict [{}]: {}.'.format(class_labels[i], class_labels[j], result[i][j]))
+def print_confusion_matrix(result, class_labels,file_path):
+    with open(file_path, 'w') as f:
+        sys.stdout = f
+        for i in range(len(class_labels)):
+            for j in range(len(class_labels)):
+                if result[i][j] == 0: continue
+                print('Actual [{}], Predict [{}]: {}.'.format(class_labels[i], class_labels[j], result[i][j]))
