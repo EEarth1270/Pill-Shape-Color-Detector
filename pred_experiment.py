@@ -1,12 +1,10 @@
 import sys
 import pandas as pd
-import os
 from func import fed
 from tqdm import tqdm
 from sklearn.metrics import classification_report
 import os
-dataset = pd.read_csv('../Pillbox.csv')
-
+dataset = pd.read_csv('/../Pillbox.csv')
 
 
 # we only consider dataset that only have images.

@@ -1,6 +1,9 @@
 import imutils
 import cv2
 import matplotlib.pyplot as plt
+import os.path
+
+from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 
 
 def load_image(path_img):
@@ -20,9 +23,9 @@ def cvt2gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-def create_mask(img, number=25,cont=3.5):
+def create_mask(img, number=25, cont=3.5):
     # return cv2.threshold(img,number,255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,  number,cont)
+    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, number, cont)
 
 
 def largest_contour(mask):
@@ -38,28 +41,12 @@ def largest_contour(mask):
     return largestCont
 
 
-def drawing_cont(img, contour,coefficient=0.037):
+def drawing_cont(img, contour, coefficient=0.037):
     epsilon = coefficient * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     # print(len(approx))
     cv2.drawContours(img, approx, -1, (255, 0, 255), 5)
     return approx
-
-
-
-
-def shapeDetector(path_img):
-    img = load_image(path_img)
-    gray = cvt2gray(img)
-    mask = create_mask(gray, 0)
-    # show_image(mask)
-    cont = largest_contour(mask)
-    # we use the second largest because normally largest are box of the picture
-    approx = drawing_cont(img, cont)
-    # show_image(img)
-    pred = shapePred(approx)
-    # cv2.imwrite(save_path,img)
-    return len(approx), pred
 
 
 def shapePred(approx):
@@ -77,16 +64,53 @@ def shapePred(approx):
     return a
 
 
-def Grid_shape_pred(path_img,block_size,constant,coefficient):
+def Grid_shape_pred(path_img, block_size, constant, coefficient):
     img = load_image(path_img)
     gray = cvt2gray(img)
     mask = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, constant)
     cont = largest_contour(mask)
-    approx = drawing_cont(img, cont,coefficient)
+    approx = drawing_cont(img, cont, coefficient)
     # show_image(img)
     pred = shapePred(approx)
     # cv2.imwrite(save_path,img)
     return len(approx), pred
 
 
+def shapeDetector(path_img):
+    img = load_image(path_img)
+    gray = cvt2gray(img)
+    mask = create_mask(gray, cont=4)
+    # show_image(mask)
+    cont = largest_contour(mask)
+    # we use the second largest because normally largest are box of the picture
+    approx = drawing_cont(img, cont)
+    # show_image(img)
+    pred = shapePred(approx)
+    # cv2.imwrite(save_path,img)
+    return len(approx), pred
 
+
+def roiImage(path_img):
+    img = load_image(path_img)
+    gray = cvt2gray(img)
+    mask = create_mask(gray, cont=4)
+    cont = largest_contour(mask)
+    x, y, w, h = cv2.boundingRect(cont)
+    ROI = img[y: y + h, x: x + w]
+    croppedImg = ROI[22: -22, 22: -22]
+    return croppedImg
+
+
+def colorPrediction(croppedImg):
+    PATH = '../src/training.data'
+    if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
+        print('training data is ready, classifier is loading...')
+    else:
+        print('training data is being created...')
+        open('training.data', 'w')
+        color_histogram_feature_extraction.training()
+        print('training data is ready, classifier is loading...')
+    # get the prediction
+    color_histogram_feature_extraction.color_histogram_of_test_image(croppedImg)
+    prediction = knn_classifier.main('training.data', 'test.data')
+    return prediction

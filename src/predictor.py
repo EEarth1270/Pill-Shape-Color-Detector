@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from func import fed
 from tqdm import tqdm
+
 dataset = pd.read_csv('../../Pillbox.csv')
 
 # we only consider dataset that only have images.
@@ -47,14 +48,14 @@ cond4 = dataset.splshape_text == 'SEMI-CIRCLE'
 dataset.loc[cond4, 'splshape_text'] = 'FREEFORM'
 # print(dataset[dataset.splshape_text == 'TEAR'])
 
-block_size= [3,5,7]
-contant= [1,2,3]
-coef  = [0.01,0.015,0.02,0.025,0.03]
+block_size = [3, 5, 7]
+contant = [1, 2, 3]
+coef = [0.01, 0.015, 0.02, 0.025, 0.03]
 
 print(dataset.splshape_text.value_counts())
 # dataset.splimage.unique().tofile('../file_image_count.csv', ',')
 
-for index,row in tqdm(dataset.iterrows()):
+for index, row in tqdm(dataset.iterrows()):
     condition = dataset['splimage'] == row.splimage
     img = row.splimage + '.jpg'
     path = os.path.join('../..', 'pillbox_production_images_full_201812', img)
