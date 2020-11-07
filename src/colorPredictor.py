@@ -15,7 +15,6 @@ for index, row in tqdm(dataset.iterrows()):
     condition = dataset['splimage'] == row.splimage
     img = row.splimage + '.jpg'
     path_image = os.path.join('..', '..', 'pillbox_production_images_full_201812', img)
-    croppedImg = fed.roiImage(path_image)
-    prediction = fed.colorPrediction(croppedImg)
+    prediction = fed.colorPrediction(path_image)
     dataset.loc[condition, 'predict_color'] = prediction
 dataset.to_csv('../../dataset_afterpred.csv')

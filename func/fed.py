@@ -101,7 +101,8 @@ def roiImage(path_img):
     return croppedImg
 
 
-def colorPrediction(croppedImg):
+def colorPrediction(path_img):
+    croppedImg = roiImage(path_img)
     PATH = '../src/training.data'
     if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
         print('training data is ready, classifier is loading...')
