@@ -85,40 +85,10 @@ def color_histogram_of_training_image(img_name):
 
 
 def training():
-    # red color training images
-    for f in os.listdir('../color_training_dataset/red'):
-        color_histogram_of_training_image('../color_training_dataset/red/' + f)
-
-    # yellow color training images
-    for f in os.listdir('../color_training_dataset/yellow'):
-        color_histogram_of_training_image('../color_training_dataset/yellow/' + f)
-
-    # green color training images
-    for f in os.listdir('../color_training_dataset/green'):
-        color_histogram_of_training_image('../color_training_dataset/green/' + f)
-
-    # orange color training images
-    for f in os.listdir('../color_training_dataset/orange'):
-        color_histogram_of_training_image('../color_training_dataset/orange/' + f)
-
-    # white color training images
-    for f in os.listdir('../color_training_dataset/white'):
-        color_histogram_of_training_image('../color_training_dataset/white/' + f)
-
-    # black color training images
-    for f in os.listdir('../color_training_dataset/black'):
-        color_histogram_of_training_image('../color_training_dataset/black/' + f)
-
-    # blue color training images
-    for f in os.listdir('../color_training_dataset/blue'):
-        color_histogram_of_training_image('../color_training_dataset/blue/' + f)
-
-    # brown color training images
-    for f in os.listdir('../color_training_dataset/brown'):
-        color_histogram_of_training_image('../color_training_dataset/brown/' + f)
-
-    for f in os.listdir('../color_training_dataset/pink'):
-        color_histogram_of_training_image('../color_training_dataset/pink/' + f)
-
-    for f in os.listdir('../color_training_dataset/purple'):
-        color_histogram_of_training_image('../color_training_dataset/purple/' + f)
+    color = ['red','yellow','green','orange','white','black','blue','brown','pink','purple']
+    for c in color:
+        color_path = os.path.join('color_training_dataset', c)
+        for file in os.listdir(color_path):
+            file_path = os.path.join(color_path, file)
+            print(file_path)
+            color_histogram_of_training_image(file_path)

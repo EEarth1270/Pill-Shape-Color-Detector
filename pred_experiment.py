@@ -1,8 +1,9 @@
 import sys
 import pandas as pd
-from func import fed
+import func.fed as fed
 from tqdm import tqdm
 from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
 import os
 dataset = pd.read_csv('/../Pillbox.csv')
 
@@ -50,6 +51,8 @@ cond4 = dataset.splshape_text == 'SEMI-CIRCLE'
 dataset.loc[cond4, 'splshape_text'] = 'FREEFORM'
 # print(dataset[dataset.splshape_text == 'TEAR'])
 
+train,test= train_test_split(dataset,test_size=0.3, stratify=dataset['splshape_text'],random_state=1)
+
 
 def grid_search(dataframe, block_sizes, constants, co_ef):
     for block in tqdm(block_sizes):
@@ -86,10 +89,10 @@ def print_polygon(dataframe):
     print(dataframe[dataframe['splshape_text'] == 'FREEFORM'].number_polygon.value_counts())
 
 
-block_size = [15, 17,19,21,23,25]
-contant = [3, 3.5]
-coef = [0.037, 0.039, 0.042, 0.046, 0.048]
+block_size = [27]
+contant = [3.5]
+coef = [0.027,0.028,0.029,0.03,0.031,0.032,0.033,0.034,0.035,0.036,0.037]
 class_label = ['ROUND', 'OVAL', 'CAPSULE', 'TRIANGLE', 'QUADRANGLE', 'FREEFORM']
 
-grid_search(dataset,block_size,contant,coef)
+grid_search(train,block_size,contant,coef)
 
