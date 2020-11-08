@@ -70,10 +70,10 @@ def shapePred(approx):
     a = 'FREEFORM'
     if len(approx) == 8:
         a = 'ROUND'
-    elif len(approx) == 7:
-        a = 'OVAL'
+    # elif len(approx) == 7:
+    #     a = 'OVAL'
     elif len(approx) == 6:
-        a = 'CAPSULE'
+        a = 'CAPSULE_or_OVAL'
     elif len(approx) == 5:
         a = 'TRIANGLE'
     elif len(approx) == 4:
