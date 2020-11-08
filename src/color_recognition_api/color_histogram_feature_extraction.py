@@ -2,8 +2,6 @@ import os
 import cv2
 import numpy as np
 
-from func import fed
-
 
 def color_histogram_of_test_image(test_src_image):
     # load the image
@@ -85,9 +83,12 @@ def color_histogram_of_training_image(img_name):
 
 
 def training():
-    color = ['red','yellow','green','orange','white','black','blue','brown','pink','purple']
+    color = ['red', 'yellow', 'green', 'orange', 'white', 'black', 'blue', 'brown', 'pink', 'purple']
     for c in color:
-        color_path = os.path.join('color_training_dataset', c)
+        # Please check your own path if you got error from color_path
+        # Using os.getcwd() for check the real path
+        color_path = os.path.join('..', 'color_training_dataset', c)
+        print(color_path)
         for file in os.listdir(color_path):
             file_path = os.path.join(color_path, file)
             print(file_path)
