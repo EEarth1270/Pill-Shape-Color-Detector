@@ -9,7 +9,6 @@ dataset = pd.read_csv('../Pillbox.csv')
 dataset = dataset[dataset.has_image == True]
 dataset = dataset[['ID', 'splimage', 'splshape_text', 'splcolor_text']]
 dataset = dataset[dataset.splimage != 'no_product_image']
-
 # For check with img file if it exist! one time usage
 
 # for img in dataset['splimage']:
@@ -58,7 +57,7 @@ train,test= train_test_split(dataset,test_size=0.3, stratify=dataset['splshape_t
 
 for index,row in tqdm(train.iterrows()):
     img = row.splimage + '.jpg'
-    path = os.path.join( '..', 'pillbox_production_images_full_201812', img)
+    path = os.path.join('..', 'pillbox_production_images_full_201812', img)
     number_polygon, shape = fed.shapeDetector(path)
     train.loc[index,'number_polygon'] = number_polygon
     train.loc[index,'predict_shape'] = shape
@@ -68,7 +67,7 @@ train.to_csv('../dataset_afterpred_train.csv')
 
 for index,row in tqdm(test.iterrows()):
     img = row.splimage + '.jpg'
-    path = os.path.join( '..', 'pillbox_production_images_full_201812', img)
+    path = os.path.join('..', 'pillbox_production_images_full_201812', img)
     number_polygon, shape = fed.shapeDetector(path)
     test.loc[index,'number_polygon'] = number_polygon
     test.loc[index,'predict_shape'] = shape

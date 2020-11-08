@@ -1,6 +1,5 @@
 import pandas as pd
 import sys
-from src import confusionMatrix as cF
 import numpy as np
 from sklearn.metrics import classification_report
 

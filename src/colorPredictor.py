@@ -1,3 +1,5 @@
+from sklearn.model_selection import train_test_split
+
 from func import fed
 import os.path
 import pandas as pd
@@ -5,16 +7,24 @@ from tqdm import tqdm
 
 dataset = pd.read_csv('../../Pillbox.csv')
 dataset = dataset[dataset.has_image == True]
-dataset = dataset[['splimage', 'splcolor_text']]
+dataset = dataset[['ID', 'splimage', 'splcolor_text']]
 dataset = dataset[dataset.splimage != 'no_product_image']
-print(os.getcwdb())
-data = dataset.splcolor_text == 'GRAY'
-print(data.value_counts())
+print(dataset)
 
-for index, row in tqdm(dataset.iterrows()):
-    condition = dataset['splimage'] == row.splimage
+train, test = train_test_split(dataset, test_size=0.3, random_state=1)
+# print(train)
+for index, row in tqdm(train.iterrows()):
     img = row.splimage + '.jpg'
     path_image = os.path.join('..', '..', 'pillbox_production_images_full_201812', img)
     prediction = fed.colorPrediction(path_image)
-    dataset.loc[condition, 'predict_color'] = prediction
-dataset.to_csv('../../dataset_afterpred.csv')
+    train.loc[index, 'predict_color'] = prediction
+
+dataset.to_csv('../../dataset_afterpredColor_train.csv')
+
+# for index, row in tqdm(test.iterrows()):
+#     img = row.splimage + '.jpg'
+#     path_image = os.path.join('..', '..', 'pillbox_production_images_full_201812', img)
+#     prediction = fed.colorPrediction(path_image)
+#     test.loc[index, 'predict_color'] = 'prediction'
+#
+# dataset.to_csv('../../dataset_afterpredColor_test.csv')
