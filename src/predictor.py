@@ -51,9 +51,12 @@ dataset.loc[cond4, 'splshape_text'] = 'CAPSULE_or_OVAL'
 cond4 = dataset.splshape_text == 'CAPSULE'
 dataset.loc[cond4, 'splshape_text'] = 'CAPSULE_or_OVAL'
 
+#
+# print(dataset)
+# train,test= train_test_split(dataset,test_size=0.3, stratify=dataset['splshape_text'],random_state=1)
 
-print(dataset)
-train,test= train_test_split(dataset,test_size=0.3, stratify=dataset['splshape_text'],random_state=1)
+train,test= train_test_split(dataset,test_size=0.3,random_state=1)
+
 
 for index,row in tqdm(train.iterrows()):
     img = row.splimage + '.jpg'
@@ -62,7 +65,9 @@ for index,row in tqdm(train.iterrows()):
     train.loc[index,'number_polygon'] = number_polygon
     train.loc[index,'predict_shape'] = shape
 
-train.to_csv('../dataset_afterpred_train.csv')
+    # break
+
+train.to_csv('../dataset_afterpred_train_shape.csv')
 
 
 for index,row in tqdm(test.iterrows()):
@@ -72,4 +77,7 @@ for index,row in tqdm(test.iterrows()):
     test.loc[index,'number_polygon'] = number_polygon
     test.loc[index,'predict_shape'] = shape
 
-test.to_csv('../dataset_afterpred_test.csv')
+    # prediction = fed.colorPrediction(path)
+    # test.loc[index, 'predict_color'] = prediction
+
+test.to_csv('../dataset_afterpred_test_shape.csv')

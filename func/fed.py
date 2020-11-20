@@ -1,10 +1,14 @@
 import imutils
 import cv2
 import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.python.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from imutils import contours as ct
-import os.path
+import os
+import sys
 
-from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
+# from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 
 
 def load_image(path_img):
@@ -24,9 +28,9 @@ def cvt2gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-def create_mask(img, number=25,cont=3.5):
+def create_mask(img, number=25, cont=3.5):
     # return cv2.threshold(img,number,255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,  number,cont)
+    return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, number, cont)
 
 
 def largest_contour(mask):
@@ -48,8 +52,6 @@ def drawing_cont(img, contour, coefficient=0.037):
     # print(len(approx))
     cv2.drawContours(img, approx, -1, (255, 0, 255), 5)
     return approx
-
-
 
 
 def shapeDetector(path_img):
@@ -81,12 +83,12 @@ def shapePred(approx):
     return a
 
 
-def Grid_shape_pred(path_img,block_size,constant,coefficient):
+def Grid_shape_pred(path_img, block_size, constant, coefficient):
     img = load_image(path_img)
     gray = cvt2gray(img)
     mask = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, constant)
     cont = largest_contour(mask)
-    approx = drawing_cont(img, cont,coefficient)
+    approx = drawing_cont(img, cont, coefficient)
     # show_image(img)
     pred = shapePred(approx)
     # cv2.imwrite(save_path,img)
@@ -103,32 +105,63 @@ def shapeDetector(path_img):
     approx = drawing_cont(img, cont)
     # show_image(img)
     pred = shapePred(approx)
-    # cv2.imwrite(save_path,img)
     return len(approx), pred
 
 
-def roiImage(path_img):
-    img = load_image(path_img)
-    gray = cvt2gray(img)
-    mask = create_mask(gray, cont=4)
-    cont = largest_contour(mask)
-    x, y, w, h = cv2.boundingRect(cont)
-    ROI = img[y: y + h, x: x + w]
-    croppedImg = ROI[22: -22, 22: -22]
-    return croppedImg
+# def roiImage(path_img):
+#     img = load_image(path_img)
+#     gray = cvt2gray(img)
+#     mask = create_mask(gray, cont=4)
+#     cont = largest_contour(mask)
+#     x, y, w, h = cv2.boundingRect(cont)
+#     ROI = img[y: y + h, x: x + w]
+#     croppedImg = ROI[22: -22, 22: -22]
+#     return croppedImg
+
+#
+# def colorPrediction(path_img):
+#     croppedImg = roiImage(path_img)
+#     PATH = '../src/training.data'
+#     # if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
+#     #     print('training data is ready, classifier is loading...')
+#     # else:
+#     #     print('training data is being created...')
+#     #     open('training.data', 'w')
+#     #     color_histogram_feature_extraction.training()
+#     #     print('training data is ready, classifier is loading...')
+#     # # get the prediction
+#     color_histogram_feature_extraction.color_histogram_of_test_image(croppedImg)
+#     prediction = knn_classifier.main('training.data', 'test.data')
+#     return prediction
 
 
-def colorPrediction(path_img):
-    croppedImg = roiImage(path_img)
-    PATH = '../src/training.data'
-    if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
-        print('training data is ready, classifier is loading...')
+def predict_oval(x):
+    per = x[0] * 100
+    if per >= 50.0:
+        return 'OVAL'
     else:
-        print('training data is being created...')
-        open('training.data', 'w')
-        color_histogram_feature_extraction.training()
-        print('training data is ready, classifier is loading...')
-    # get the prediction
-    color_histogram_feature_extraction.color_histogram_of_test_image(croppedImg)
-    prediction = knn_classifier.main('training.data', 'test.data')
-    return prediction
+        return 'CAPSULE'
+
+
+def main():
+    print(sys.argv)
+    # 0 is file fed.py , 1 is arg image_path
+    path_img = sys.argv[1]
+    model = load_model('ai_model') # load tf model define path
+    polygon,pred = shapeDetector(path_img)
+    if pred == 'CAPSULE_or_OVAL':
+        img = load_img(path_img, target_size=(256, 256))
+        img_array = img_to_array(img) * (1. / 255.)
+        img_array = tf.expand_dims(img_array, 0)
+        predictor = model.predict(img_array)
+        pred = predict_oval(predictor)
+
+    print(pred)
+#     pred is the prediction shape
+#   for fluke color reimport and implement it below
+
+
+
+
+if __name__ == "__main__":
+    main()

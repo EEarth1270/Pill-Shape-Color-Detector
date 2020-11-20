@@ -87,9 +87,10 @@ def training():
     for c in color:
         # Please check your own path if you got error from color_path
         # Using os.getcwd() for check the real path
-        color_path = os.path.join('..', 'color_training_dataset', c)
-        print(color_path)
+        # color_path = os.path.join('..', 'color_training_dataset', c) for fluke
+        color_path = os.path.join('color_training_dataset', c)
+        # print(color_path)
         for file in os.listdir(color_path):
             file_path = os.path.join(color_path, file)
-            print(file_path)
+            # print(file_path)
             color_histogram_of_training_image(file_path)
