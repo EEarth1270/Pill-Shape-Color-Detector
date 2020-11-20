@@ -9,6 +9,7 @@ import os
 import sys
 
 # from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
+from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 
 
 def load_image(path_img):
@@ -108,31 +109,29 @@ def shapeDetector(path_img):
     return len(approx), pred
 
 
-# def roiImage(path_img):
-#     img = load_image(path_img)
-#     gray = cvt2gray(img)
-#     mask = create_mask(gray, cont=4)
-#     cont = largest_contour(mask)
-#     x, y, w, h = cv2.boundingRect(cont)
-#     ROI = img[y: y + h, x: x + w]
-#     croppedImg = ROI[22: -22, 22: -22]
-#     return croppedImg
+def roiImage(path_img):
+    img = load_image(path_img)
+    gray = cvt2gray(img)
+    mask = create_mask(gray, cont=4)
+    cont = largest_contour(mask)
+    x, y, w, h = cv2.boundingRect(cont)
+    ROI = img[y: y + h, x: x + w]
+    croppedImg = ROI[22: -22, 22: -22]
+    return croppedImg
 
-#
-# def colorPrediction(path_img):
-#     croppedImg = roiImage(path_img)
-#     PATH = '../src/training.data'
-#     # if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
-#     #     print('training data is ready, classifier is loading...')
-#     # else:
-#     #     print('training data is being created...')
-#     #     open('training.data', 'w')
-#     #     color_histogram_feature_extraction.training()
-#     #     print('training data is ready, classifier is loading...')
-#     # # get the prediction
-#     color_histogram_feature_extraction.color_histogram_of_test_image(croppedImg)
-#     prediction = knn_classifier.main('training.data', 'test.data')
-#     return prediction
+
+def colorPrediction(path_img):
+    croppedImg = roiImage(path_img)
+    PATH = '../src/training.data'
+    if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
+        print('training data is ready, classifier is loading...')
+    else:
+        open('training.data', 'w')
+        color_histogram_feature_extraction.training()
+    # get the prediction
+    color_histogram_feature_extraction.color_histogram_of_test_image(croppedImg)
+    prediction = knn_classifier.main('training.data', 'test.data')
+    return prediction
 
 
 def predict_oval(x):
@@ -147,20 +146,20 @@ def main():
     print(sys.argv)
     # 0 is file fed.py , 1 is arg image_path
     path_img = sys.argv[1]
-    model = load_model('ai_model') # load tf model define path
-    polygon,pred = shapeDetector(path_img)
+    model = load_model('ai_model')  # load tf model define path
+    polygon, pred = shapeDetector(path_img)
     if pred == 'CAPSULE_or_OVAL':
         img = load_img(path_img, target_size=(256, 256))
         img_array = img_to_array(img) * (1. / 255.)
         img_array = tf.expand_dims(img_array, 0)
         predictor = model.predict(img_array)
         pred = predict_oval(predictor)
-
     print(pred)
-#     pred is the prediction shape
-#   for fluke color reimport and implement it below
-
-
+    # pred is the prediction shape
+    # for fluke color reimport and implement it below
+    cropped_img = roiImage(path_img)
+    prediction = colorPrediction(cropped_img)
+    print(prediction)
 
 
 if __name__ == "__main__":

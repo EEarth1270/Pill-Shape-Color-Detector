@@ -70,13 +70,11 @@ def main(training_data, test_data):
     test_feature_vector = []  # test feature vector
     loadDataset(training_data, test_data, training_feature_vector, test_feature_vector)
     classifier_prediction = []  # predictions
-    k = 11  # K value of k nearest neighbor
+    k = 5  # K value of k nearest neighbor
     for x in range(len(test_feature_vector)):
         neighbors = kNearestNeighbors(training_feature_vector, test_feature_vector[x], k)
         result = responseOfNeighbors(neighbors)
         classifier_prediction.append(result)
-        # print(neighbors)
-    print(classifier_prediction)
     if not classifier_prediction:
         return 'NONE'
     else:
