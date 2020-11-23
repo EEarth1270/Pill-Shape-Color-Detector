@@ -8,7 +8,6 @@ from imutils import contours as ct
 import os
 import sys
 
-# from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 
 
