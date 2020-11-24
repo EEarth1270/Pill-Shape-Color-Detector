@@ -12,7 +12,7 @@ def color_histogram_of_test_image(test_src_image):
     counter = 0
     for (chan, color) in zip(chans, colors):
         counter = counter + 1
-
+        # calculate a histogram color
         hist = cv2.calcHist([chan], [0], None, [256], [0, 256])
         features.extend(hist)
 
@@ -26,7 +26,6 @@ def color_histogram_of_test_image(test_src_image):
         elif counter == 3:
             red = str(elem)
             feature_data = red + ',' + green + ',' + blue
-            # print(feature_data)
 
     with open('test.data', 'w') as myfile:
         myfile.write(feature_data)
@@ -81,16 +80,11 @@ def color_histogram_of_training_image(img_name):
     with open('training.data', 'a') as myfile:
         myfile.write(feature_data + ',' + data_source + '\n')
 
-
+# writing the training data
 def training():
     color = ['red', 'yellow', 'green', 'orange', 'white', 'black', 'blue', 'brown', 'pink', 'purple']
     for c in color:
-        # Please check your own path if you got error from color_path
-        # Using os.getcwd() for check the real path
-        # color_path = os.path.join('..', 'color_training_dataset', c) for fluke
         color_path = os.path.join('color_training_dataset', c)
-        # print(color_path)
         for file in os.listdir(color_path):
             file_path = os.path.join(color_path, file)
-            # print(file_path)
             color_histogram_of_training_image(file_path)

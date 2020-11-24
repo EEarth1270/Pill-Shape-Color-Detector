@@ -103,7 +103,9 @@ def shapeDetector(path_img):
 
 # Below is the code of color prediction that run from this function
 
-
+# First, find the interest area of the contour in image for same preprocessing state and making rectangle frame.
+# Then crop the image again to get real colour of pills
+# (because KNN have calculating most values from the top left first)
 def roiImage(path_img):
     img = load_image(path_img)
     gray = cvt2gray(img)
@@ -114,7 +116,7 @@ def roiImage(path_img):
     croppedImg = ROI[22: -22, 22: -22]
     return croppedImg
 
-
+# Second, compare the cropped image to color training data, then use KNN to predict again
 def colorPrediction(path_img):
     croppedImg = roiImage(path_img)
     PATH = '../src/training.data'
