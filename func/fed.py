@@ -10,7 +10,7 @@ import sys
 
 from src.color_recognition_api import color_histogram_feature_extraction, knn_classifier
 
-
+#  Preprocessing code start here
 def load_image(path_img):
     img = cv2.imread(path_img)
     img2 = imutils.resize(img, width=360)
@@ -29,27 +29,25 @@ def cvt2gray(img):
 
 
 def create_mask(img, number=25, cont=3.5):
-    # return cv2.threshold(img,number,255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, number, cont)
 
+# These functions were write with helps on website https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
+# with tuning parameter and diy the coding part
 
 def largest_contour(mask):
     contours = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # cv.CHAIN_APPROX_SIMPLE,CHAIN_APPROX_TC89_KCOS
     contours = imutils.grab_contours(contours)
-    # where cnts is the variable in which contours are stored, replace it with your variable name
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
     # sorts contours according to their area from largest to smallest.
     largestCont = contours[1]  # store the largest contour
     area = cv2.contourArea(largestCont)
-    # print('area = ', area)
     return largestCont
 
 
 def drawing_cont(img, contour, coefficient=0.037):
     epsilon = coefficient * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
-    # print(len(approx))
+
     cv2.drawContours(img, approx, -1, (255, 0, 255), 5)
     return approx
 
@@ -58,13 +56,9 @@ def shapeDetector(path_img):
     img = load_image(path_img)
     gray = cvt2gray(img)
     mask = create_mask(gray, 0)
-    # show_image(mask)
     cont = largest_contour(mask)
-    # we use the second largest because normally largest are box of the picture
     approx = drawing_cont(img, cont)
-    # show_image(img)
     pred = shapePred(approx)
-    # cv2.imwrite(save_path,img)
     return len(approx), pred
 
 
@@ -83,16 +77,15 @@ def shapePred(approx):
     return a
 
 
-def Grid_shape_pred(path_img, block_size, constant, coefficient):
-    img = load_image(path_img)
-    gray = cvt2gray(img)
-    mask = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, constant)
-    cont = largest_contour(mask)
-    approx = drawing_cont(img, cont, coefficient)
-    # show_image(img)
-    pred = shapePred(approx)
-    # cv2.imwrite(save_path,img)
-    return len(approx), pred
+# This function created for doing gridsearch to find the better coefficient
+# def Grid_shape_pred(path_img, block_size, constant, coefficient):
+#     img = load_image(path_img)
+#     gray = cvt2gray(img)
+#     mask = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_size, constant)
+#     cont = largest_contour(mask)
+#     approx = drawing_cont(img, cont, coefficient)
+#     pred = shapePred(approx)
+#     return len(approx), pred
 
 
 def shapeDetector(path_img):
@@ -106,6 +99,9 @@ def shapeDetector(path_img):
     # show_image(img)
     pred = shapePred(approx)
     return len(approx), pred
+
+
+# Below is the code of color prediction that run from this function
 
 
 def roiImage(path_img):
@@ -154,8 +150,7 @@ def main():
         predictor = model.predict(img_array)
         pred = predict_oval(predictor)
     print(pred)
-    # pred is the prediction shape
-    # for fluke color reimport and implement it below
+
     cropped_img = roiImage(path_img)
     prediction = colorPrediction(cropped_img)
     print(prediction)
